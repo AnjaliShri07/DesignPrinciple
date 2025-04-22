@@ -1,0 +1,159 @@
+🔸 1. Single Responsibility Principle (SRP)
+A class should have only one reason to change.
+
+✅ Why & When
+Promotes clean separation of concerns
+Makes code easier to test and maintain
+
+✅ Example
+// Responsible only for employee data
+public record Employee(String name, String position) {}
+
+// Responsible only for printing
+public class EmployeePrinter {
+    public void print(Employee employee) {
+        System.out.println(employee.name() + " - " + employee.position());
+    }
+}
+✅ Pros
+Easier debugging & testing
+Better reusability
+
+❌ Cons
+May increase the number of classes
+
+🔸 2. Open/Closed Principle (OCP)
+Software entities should be open for extension, but closed for modification.
+
+✅ Why & When
+Useful in plug-in architectures or where features evolve frequently
+
+✅ Example (with sealed interface)
+
+public sealed interface Shape permits Circle, Rectangle {
+    double area();
+}
+
+public record Circle(double radius) implements Shape {
+    public double area() { return Math.PI * radius * radius; }
+}
+
+public record Rectangle(double width, double height) implements Shape {
+    public double area() { return width * height; }
+}
+✅ Pros
+New behavior added without touching existing code
+
+❌ Cons
+May require abstract planning up front
+
+🔸 3. Liskov Substitution Principle (LSP)
+Subtypes must be substitutable for their base types.
+
+✅ Why & When
+Ensures polymorphism works without surprises
+
+✅ Example
+
+public sealed interface Bird permits Sparrow, Penguin {
+    void makeSound();
+}
+
+public final class Sparrow implements Bird {
+    public void makeSound() { System.out.println("Chirp!"); }
+}
+
+public final class Penguin implements Bird {
+    public void makeSound() { System.out.println("Honk!"); }
+}
+Every Bird behaves like a Bird. No surprises like a Bird that cannot makeSound.
+
+✅ Pros
+Better abstraction
+Safer inheritance
+
+❌ Cons
+Violations are subtle and sometimes overlooked
+
+🔁 First, Why They Look Similar
+Both LSP and OCP rely on abstraction (interfaces or abstract classes).
+Both allow you to use different implementations without changing code.
+BUT the purpose and intent are different:
+
+Principle | Focus | Goal
+OCP (Open/Closed Principle) | Extensibility | You can add new functionality without modifying existing code
+LSP (Liskov Substitution Principle) | Substitutability | Any subclass should be usable in place of the parent class/interface without breaking correctness.
+
+🔸 4. Interface Segregation Principle (ISP)
+Clients should not be forced to depend on interfaces they don’t use.
+
+✅ Why & When
+Especially useful in large, modular systems
+
+✅ Bad Interface
+
+interface Worker {
+    void code();
+    void test();
+    void manage(); // What if this is a tester?
+}
+✅ Improved Interface Design
+
+interface Coder { void code(); }
+interface Tester { void test(); }
+interface Manager { void manage(); }
+
+public class Developer implements Coder, Tester {
+    public void code() { System.out.println("Coding..."); }
+    public void test() { System.out.println("Testing..."); }
+}
+✅ Pros
+Clients only implement what they need
+Fewer bugs due to unused methods
+
+❌ Cons
+More interfaces to manage
+
+🔸 5. Dependency Inversion Principle (DIP)
+High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+✅ Why & When
+Encourages loosely coupled code
+
+Essential for unit testing and plug-and-play modules
+
+✅ Example using interfaces
+
+interface Keyboard {
+    void type();
+}
+
+class MechanicalKeyboard implements Keyboard {
+    public void type() { System.out.println("Clickety click"); }
+}
+
+class Computer {
+    private final Keyboard keyboard;
+
+    public Computer(Keyboard keyboard) {
+        this.keyboard = keyboard;
+    }
+
+    public void use() {
+        keyboard.type();
+    }
+}
+✅ Pros
+Makes unit testing easier
+Promotes extensibility
+
+❌ Cons
+More interfaces and indirection
+
+🧠 Summary Table
+Principle | What It Promotes | When to Use | Java 17 Features
+SRP | Separation of concerns | Always | record, utility classes
+OCP | Extensibility | When features grow | sealed & record
+LSP | Safe polymorphism | Always | sealed, runtime safety
+ISP | Interface modularity | Large systems | Multiple interfaces
+DIP | Loose coupling | For plug-and-play or testability | Interfaces + constructors
